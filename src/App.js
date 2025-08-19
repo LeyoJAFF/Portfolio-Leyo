@@ -451,65 +451,65 @@ useEffect(() => {
 }, [handleNavScroll]);
 
 useEffect(() => {
-  // Skip if user prefers reduced motion
+  // Skip on reduced motion *or* touch devices
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia('(pointer: coarse)').matches) return;
 
   const colors = ['var(--cyan)', 'var(--coral)', 'var(--purple)'];
-  const MAX_LIVE = 70;       // cap DOM nodes for perf
+  const MAX_LIVE = 70;
   const SPARKLES_PER_MOVE = 2;
-  let live = 0;
+
+  // ref-like counter so the handler doesn't capture a loop var
+  const liveRef = { current: 0 };
   let lastT = 0;
+
+  // declared once (not inside the loop) → no-loop-func safe
+  const onSparkleEnd = (ev) => {
+    const el = ev.currentTarget;
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+    liveRef.current = Math.max(0, liveRef.current - 1);
+  };
 
   const onMove = (e) => {
     const now = performance.now();
-    if (now - lastT < 14) return;     // throttle ~70fps
+    if (now - lastT < 14) return; // ~70fps throttle
     lastT = now;
 
     for (let i = 0; i < SPARKLES_PER_MOVE; i++) {
-      if (live >= MAX_LIVE) break;
+      if (liveRef.current >= MAX_LIVE) break;
 
       const el = document.createElement('span');
       el.className = 'cursor-sparkle';
 
-      // size 4–10px
       const size = 4 + Math.random() * 6;
       el.style.width = `${size}px`;
       el.style.height = `${size}px`;
-
-      // start at cursor
       el.style.left = `${e.clientX}px`;
       el.style.top = `${e.clientY}px`;
-
-      // random color from your theme variables
       el.style.background = colors[(Math.random() * colors.length) | 0];
 
-      // random drift (distance 20–60px, any angle)
       const angle = Math.random() * Math.PI * 2;
       const dist = 20 + Math.random() * 40;
       el.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
       el.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
-
-      // slight random duration variation (keeps things organic)
       el.style.animationDuration = `${600 + Math.random() * 250}ms`;
 
       document.body.appendChild(el);
-      live++;
+      liveRef.current += 1;
 
-      el.addEventListener(
-        'animationend',
-        // eslint-disable-next-line no-loop-func
-        () => {
-          el.remove();
-          live--;
-        },
-        { once: true }
-      );
+      // reuse the same handler function
+      el.addEventListener('animationend', onSparkleEnd, { once: true });
     }
   };
 
   window.addEventListener('mousemove', onMove, { passive: true });
-  return () => window.removeEventListener('mousemove', onMove);
+  return () => {
+    window.removeEventListener('mousemove', onMove);
+    // clean up any remaining sparkles
+    document.querySelectorAll('.cursor-sparkle').forEach((n) => n.remove());
+  };
 }, []);
+
 
   if (isLoading) {
     return (

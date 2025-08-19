@@ -390,7 +390,7 @@ body {
 
 /* Section Layouts */
 .section {
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: 6rem 2rem 2rem;
   display: block;             /* <- always render so scrolling works */
   opacity: 1;
@@ -448,6 +448,39 @@ body {
   background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.05) 0%, transparent 70%);
   position: relative;
   overflow: hidden;
+
+  min-height: 100vh;        /* fallback */
+  padding-top: var(--nav-height);
+}
+
+/* Use dynamic viewport units on browsers that support them */
+@supports (min-height: 100dvh) {
+  .hero-section {
+    min-height: 100dvh;
+  }
+}
+
+/* iOS/Safari safety: small viewport unit */
+@supports (min-height: 100svh) {
+  .hero-section {
+    min-height: 100svh;
+  }
+}
+
+/* Phones/tablets: reduce paint cost & ensure content fits */
+@media (hover: none), (pointer: coarse) {
+  .hero-section {
+    /* keep background but make it cheaper to render */
+    background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.06) 0%, transparent 70%);
+    contain: layout paint;      /* isolates for smoother scrolling */
+  }
+}
+
+/* If the fixed nav overlaps on very small screens, give a bit more top room */
+@media (max-width: 480px) {
+  .hero-section {
+    padding-top: calc(var(--nav-height) + 8px);
+  }
 }
 
 .hero-content.enhanced {
@@ -2418,4 +2451,31 @@ body {
 .hero-avatar-wrapper::before,
 .hero-avatar-wrapper::after {
   will-change: transform, opacity, filter, box-shadow;
+}
+
+
+/* Mobile/touch performance profile */
+@media (hover: none), (pointer: coarse) {
+  /* Kill the animated global background layers on phones */
+  .bg-effects.enhanced { position: absolute !important; z-index: -1; transform: translateZ(0); }
+  .bg-effects.enhanced::before,
+  .bg-effects.enhanced::after,
+  .grid-lines.animated,
+  .floating-particles,
+  .nebula-bg {
+    display: none !important;
+  }
+
+  /* Remove costly blur/filters that can cause stutter */
+  .inner-circle { backdrop-filter: none !important; }
+  .stat-item, .project-card { box-shadow: none; }
+
+  /* Keep neon, but lighten paint work */
+  .neon-text { text-shadow: 0 0 6px var(--cyan); }
+
+  /* Avoid hover-only transitions on tap devices */
+  .project-card.enhanced:hover,
+  .stat-item:hover {
+    transform: none;
+  }
 }
