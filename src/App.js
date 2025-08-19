@@ -78,17 +78,17 @@ const PROJECTS = [
     demoUrl: '#',
     githubUrl: '#'
   },
-  {
-    title: 'Immersive Virtual Tourism',
-    description: 'Next-generation VR tourism platform enabling photorealistic virtual travel experiences with social interaction features.',
-    tech: ['Unity', 'VR', '3D Modeling', 'WebRTC'],
-    highlight: 'VR Innovation',
-    status: 'Beta',
-    metrics: { destinations: '25+', users: '2000+', satisfaction: '96%' },
-    features: ['360° environments', 'Social VR', 'Real-time weather'],
-    demoUrl: '#',
-    githubUrl: '#'
-  },
+   {
+  title: '2048 WebGame using React',
+  description: 'The popular and addictive puzzle game available...',
+  tech: ['React', 'Git', 'Github'],
+  highlight: 'Web Game',
+  status: 'Active',
+  metrics: { destinations: '25+', users: '2000+', satisfaction: '96%' },
+  features: ['Web Game', 'Social', 'Entertainment', 'Education'],
+  demoUrl: 'https://leyojaff.github.io/2048---Game/'   // ✅ must be a real URL
+}
+
 ];
 
 // Enhanced utility functions
@@ -208,13 +208,19 @@ const ProjectCard = ({ project, index }) => {
       </div>
       
       <div className="project-actions">
-        <a href={project.demoUrl} className="btn-demo" target="_blank" rel="noopener noreferrer">
-          Live Demo
-        </a>
-        <a href={project.githubUrl} className="btn-code" target="_blank" rel="noopener noreferrer">
-          View Code
-        </a>
-      </div>
+  {project.demoUrl && project.demoUrl !== '#' && (
+    <a
+      href={project.demoUrl}
+      className="btn-demo"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Live Demo
+    </a>
+  )}
+</div>
+
+
       
       <div className="project-glow"></div>
       <div className={`project-pulse ${isHovered ? 'active' : ''}`}></div>
@@ -789,6 +795,7 @@ useEffect(() => {
               ))}
             </div>
           </div>
+          
         </section>
 
         {/* Contact */}

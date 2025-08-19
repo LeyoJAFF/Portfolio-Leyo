@@ -1403,6 +1403,25 @@ body {
   gap: 1rem;
 }
 
+.project-actions a {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--cyan);
+  color: #000;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.project-actions a:hover {
+  background: var(--purple);
+  color: #fff;
+}
+
 .btn-demo,
 .btn-code {
   flex: 1;
